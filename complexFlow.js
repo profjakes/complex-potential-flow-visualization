@@ -169,13 +169,17 @@ document.body.innerHTML = `
       <div class="cf-presets">
         <div class="cf-section-label">Presets</div>
         <button class="cf-preset-btn" data-f="z^2"><span>z²</span><span class="cf-preset-name">stagnation flow</span></button>
-        <button class="cf-preset-btn" data-f="z^3"><span>z³</span><span class="cf-preset-name">corner flow</span></button>
+        <button class="cf-preset-btn" data-f="z^3"><span>z³</span><span class="cf-preset-name">corner flow π/2</span></button>
         <button class="cf-preset-btn" data-f="log(z)"><span>log(z)</span><span class="cf-preset-name">line source</span></button>
         <button class="cf-preset-btn" data-f="1/z"><span>1/z</span><span class="cf-preset-name">doublet</span></button>
-        <button class="cf-preset-btn" data-f="z + 1/z"><span>z + 1/z</span><span class="cf-preset-name">flow past cylinder</span></button>
+        <button class="cf-preset-btn" data-f="z + 1/z" data-region="x*x+y*y-1"><span>z + 1/z</span><span class="cf-preset-name">flow past cylinder R=1</span></button>
+        <button class="cf-preset-btn" data-f="exp(-i*pi/4)*z + 4*exp(i*pi/4)/z" data-region="x*x+y*y-4"><span>cylinder α=π/4</span><span class="cf-preset-name">cylinder R=2, angle of attack</span></button>
+        <button class="cf-preset-btn" data-f="(5+3*i)/(2*sqrt(2))*z+(-3-5*i)/(2*sqrt(2))*sqrt2(z)" data-region="x*x/6.25+y*y/2.25-1"><span>ellipse flow α=π/4</span><span class="cf-preset-name">ellipse a=5/2 b=3/2</span></button>
         <button class="cf-preset-btn" data-f="sin(z)"><span>sin(z)</span><span class="cf-preset-name">sinusoidal</span></button>
         <button class="cf-preset-btn" data-f="z^2 + 2*log(z)"><span>z² + 2·log(z)</span><span class="cf-preset-name">source in corner</span></button>
         <button class="cf-preset-btn" data-f="cosh(z)"><span>cosh(z)</span><span class="cf-preset-name">hyperbolic</span></button>
+        <button class="cf-preset-btn" data-f="exp(z)"><span>exp(z)</span><span class="cf-preset-name">channel flow</span></button>
+        <button class="cf-preset-btn" data-f="log((z-1)/(z+1))"><span>log((z-1)/(z+1))</span><span class="cf-preset-name">source-sink dipole</span></button>
       </div>
 
       <div class="cf-input-group">
@@ -268,6 +272,17 @@ const C = {
   cosh: ([a,b]) => [Math.cosh(a)*Math.cos(b), Math.sinh(a)*Math.sin(b)],
   tanh: (z) => C.div(C.sinh(z),C.cosh(z)),
   sqrt: (z) => C.pow(z,0.5),
+  sqrt2: (z) => {
+    const a = z[0]*z[0]-z[1]*z[1]-4, b = 2*z[0]*z[1];
+    const r = Math.sqrt(a*a+b*b);
+    const theta = Math.atan2(b,a);
+    const mag = Math.sqrt(r);
+    const re = mag*Math.cos(theta/2);
+    const im = mag*Math.sin(theta/2);
+    // choose branch so that Re(conj(z) * sqrt) > 0, i.e. same direction as z
+    const dot = z[0]*re + z[1]*im;
+    return dot >= 0 ? [re,im] : [-re,-im];
+  },
   abs: (z) => [Math.sqrt(z[0]*z[0]+z[1]*z[1]),0],
   re: ([a]) => [a,0],
   im: ([,b]) => [b,0],
@@ -862,6 +877,13 @@ document.getElementById('cf-nlines-slider').addEventListener('input', function()
 document.querySelectorAll('.cf-preset-btn').forEach(btn => {
   btn.addEventListener('click', function(){
     document.getElementById('cf-func-input').value = this.dataset.f;
+    const regionInput = document.getElementById('cf-region-input');
+    if (this.dataset.region) {
+      regionInput.value = this.dataset.region;
+    } else {
+      regionInput.value = '';
+    }
+    applyRegion();
     draw();
   });
 });
