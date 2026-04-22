@@ -690,13 +690,25 @@ function buildStaticCache(f, W, H, range, nlines) {
     }
   }
 
+  // use percentile-based range so streamlines concentrate near the obstacle
+  // rather than spreading over extreme values at the edges
+  function percentileRange(vals, loP, hiP) {
+    const finite = Array.from(vals).filter(isFinite).sort((a,b)=>a-b);
+    if (!finite.length) return [0, 1];
+    const lo = finite[Math.floor(loP * finite.length)];
+    const hi = finite[Math.floor(hiP * finite.length)];
+    return [lo, hi];
+  }
+  const [imLo, imHi] = percentileRange(imVals, 0.05, 0.95);
+  const [reLo, reHi] = percentileRange(reVals, 0.05, 0.95);
+
   if(showColor){
     const img=oc_ctx.createImageData(W,H);
     for(let py=0;py<H;py++){
       for(let px=0;px<W;px++){
         const x=(px/W-0.5)*2*range, y=-((py/H-0.5)*2*range);
         let fz; try{fz=f([x,y]);}catch(e){fz=[0,0];}
-        const t=(fz[1]-imMin)/(imMax-imMin+1e-10);
+        const t=(fz[1]-imLo)/(imHi-imLo+1e-10);
         const i=(py*W+px)*4;
         img.data[i]=5+t*20; img.data[i+1]=20+t*40; img.data[i+2]=25+t*50; img.data[i+3]=255;
       }
@@ -731,12 +743,12 @@ function buildStaticCache(f, W, H, range, nlines) {
   }
 
   if(showStream) {
-    drawLevelCurvesTo(oc_ctx, imVals,GRID,W,H,imMin,imMax,nlines,'#4af0c8',0.85,[]);
+    drawLevelCurvesTo(oc_ctx, imVals,GRID,W,H,imLo,imHi,nlines,'#4af0c8',0.85,[]);
     if(circMode) {
-      drawLevelCurvesTo(oc_ctx, imVals,GRID,W,H,imMin,imMax,0,'#4af0c8',1.0,[0]);
+      drawLevelCurvesTo(oc_ctx, imVals,GRID,W,H,imLo,imHi,0,'#4af0c8',1.0,[0]);
     }
   }
-  if(showEquip) drawLevelCurvesTo(oc_ctx, reVals,GRID,W,H,reMin,reMax,nlines,'#f0a44a',0.5,[]);
+  if(showEquip) drawLevelCurvesTo(oc_ctx, reVals,GRID,W,H,reLo,reHi,nlines,'#f0a44a',0.5,[]);
 
   if (regionFn) oc_ctx.restore();
 
@@ -886,8 +898,21 @@ function drawLevelCurvesTo(c, vals,N,W,H,vmin,vmax,nlines,color,alpha,extraLevel
   c.save();
   // build list of levels to draw
   const levels = [];
+  // main levels spaced within [vmin, vmax]
   for(let k=1;k<nlines;k++) levels.push(vmin+(vmax-vmin)*k/nlines);
   if(extraLevels) for(const lv of extraLevels) levels.push(lv);
+
+  // also find true data min/max for corner fill
+  let dmin=Infinity, dmax=-Infinity;
+  for(let i=0;i<vals.length;i++){
+    if(isFinite(vals[i])){ if(vals[i]<dmin)dmin=vals[i]; if(vals[i]>dmax)dmax=vals[i]; }
+  }
+  // add sparse levels below vmin and above vmax to fill corners
+  const nCorner = Math.max(3, Math.floor(nlines/6));
+  for(let k=1;k<=nCorner;k++){
+    levels.push(dmin+(vmin-dmin)*k/nCorner);
+    levels.push(vmax+(dmax-vmax)*k/nCorner);
+  }
 
   for(const level of levels){
     const isExtra = extraLevels && extraLevels.includes(level);
