@@ -88,6 +88,23 @@ style.textContent = `
   .cf-preset-btn:hover { border-color: var(--accent); color: var(--accent); }
   .cf-preset-name { color: var(--dim); font-size: 0.65rem; }
 
+  #cf-preset-select {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    color: var(--accent2); font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem; padding: 8px 10px; border-radius: 4px;
+    outline: none; cursor: pointer; transition: border-color 0.2s;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234a5a64'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
+  #cf-preset-select:focus { border-color: var(--accent); }
+  #cf-preset-select optgroup { color: var(--dim); font-size: 0.65rem; }
+  #cf-preset-select option { color: var(--accent2); background: var(--panel); font-size: 0.8rem; }
+
+  #cf-gamma-group.disabled { opacity: 0.4; pointer-events: none; }
+  #cf-gamma-group.disabled #cf-gamma-hint { display: block; }
+  #cf-gamma-group:not(.disabled) #cf-gamma-hint { display: none; }
+
   .cf-controls { display: flex; flex-direction: column; gap: 10px; }
   .cf-slider-group { display: flex; flex-direction: column; gap: 4px; }
   .cf-slider-label { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--dim); }
@@ -157,8 +174,37 @@ document.body.innerHTML = `
   </header>
   <div id="cf-split">
     <div id="cf-left">
+
       <div class="cf-input-group">
-        <div class="cf-section-label">Complex Potential f(z)</div>
+        <div class="cf-section-label">Preset</div>
+        <select id="cf-preset-select">
+          <optgroup label="── Basic flows ──">
+            <option value="" data-f="z" data-region="">uniform flow</option>
+            <option value="" data-f="z^2" data-region="">stagnation flow</option>
+            <option value="" data-f="z^3" data-region="">corner flow π/2</option>
+            <option value="" data-f="z^(pi/3*3/pi*3)" data-region="">wedge π/3  (w³)</option>
+            <option value="" data-f="exp(z)" data-region="">channel flow  (eʷ)</option>
+          </optgroup>
+          <optgroup label="── Sources / sinks ──">
+            <option value="" data-f="log(z)" data-region="">line source  (log z)</option>
+            <option value="" data-f="1/z" data-region="">doublet  (1/z)</option>
+            <option value="" data-f="log((z-1)/(z+1))" data-region="">source-sink dipole</option>
+            <option value="" data-f="z^2 + 2*log(z)" data-region="">source in corner</option>
+          </optgroup>
+          <optgroup label="── Cylinders &amp; obstacles ──">
+            <option value="" data-f="z + 1/z" data-region="x*x+y*y-0.95" data-circ="z" data-circr="1">cylinder  R=1, α=0</option>
+            <option value="" data-f="exp(-i*pi/4)*z + 4*exp(i*pi/4)/z" data-region="x*x+y*y-3.85" data-circ="z" data-circr="2">cylinder  R=2, α=π/4</option>
+            <option value="" data-f="(5+3*i)/(2*sqrt(2))*z+(-3-5*i)/(2*sqrt(2))*sqrt2(z)" data-region="x*x/6.25+y*y/2.25-0.95" data-circ="gw">ellipse  a=5/2, b=3/2, α=π/4</option>
+          </optgroup>
+          <optgroup label="── Other ──">
+            <option value="" data-f="sin(z)" data-region="">sinusoidal  (sin z)</option>
+            <option value="" data-f="cosh(z)" data-region="">hyperbolic  (cosh z)</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="cf-input-group">
+        <div class="cf-section-label">Custom potential f(z)</div>
         <div class="cf-input-row" id="cf-input-row">
           <span class="cf-input-prefix">f(z) =</span>
           <input type="text" id="cf-func-input" value="z^2" autocomplete="off" spellcheck="false" />
@@ -166,27 +212,10 @@ document.body.innerHTML = `
         <div id="cf-error-msg"></div>
       </div>
 
-      <div class="cf-presets">
-        <div class="cf-section-label">Presets</div>
-        <button class="cf-preset-btn" data-f="z^2"><span>z²</span><span class="cf-preset-name">stagnation flow</span></button>
-        <button class="cf-preset-btn" data-f="z^3"><span>z³</span><span class="cf-preset-name">corner flow π/2</span></button>
-        <button class="cf-preset-btn" data-f="log(z)"><span>log(z)</span><span class="cf-preset-name">line source</span></button>
-        <button class="cf-preset-btn" data-f="1/z"><span>1/z</span><span class="cf-preset-name">doublet</span></button>
-        <button class="cf-preset-btn" data-f="z + 1/z" data-region="x*x+y*y-1"><span>z + 1/z</span><span class="cf-preset-name">flow past cylinder R=1</span></button>
-        <button class="cf-preset-btn" data-f="exp(-i*pi/4)*z + 4*exp(i*pi/4)/z" data-region="x*x+y*y-3.9"><span>cylinder α=π/4</span><span class="cf-preset-name">cylinder R=2, angle of attack</span></button>
-        <button class="cf-preset-btn" data-f="(5+3*i)/(2*sqrt(2))*z+(-3-5*i)/(2*sqrt(2))*sqrt2(z)" data-region="x*x/6.25+y*y/2.25-0.95"><span>ellipse flow α=π/4</span><span class="cf-preset-name">ellipse a=5/2 b=3/2</span></button>
-        <button class="cf-preset-btn" data-f="sin(z)"><span>sin(z)</span><span class="cf-preset-name">sinusoidal</span></button>
-        <button class="cf-preset-btn" data-f="z^2 + 2*log(z)"><span>z² + 2·log(z)</span><span class="cf-preset-name">source in corner</span></button>
-        <button class="cf-preset-btn" data-f="cosh(z)"><span>cosh(z)</span><span class="cf-preset-name">hyperbolic</span></button>
-        <button class="cf-preset-btn" data-f="exp(z)"><span>exp(z)</span><span class="cf-preset-name">channel flow</span></button>
-        <button class="cf-preset-btn" data-f="log((z-1)/(z+1))"><span>log((z-1)/(z+1))</span><span class="cf-preset-name">source-sink dipole</span></button>
-      </div>
-
       <div class="cf-input-group">
-        <div class="cf-section-label">Region overlay <span style="font-size:0.6rem;color:var(--dim);text-transform:none;letter-spacing:0">(x,y) in complex plane</span></div>
+        <div class="cf-section-label">Region overlay <span style="font-size:0.6rem;color:var(--dim);text-transform:none;letter-spacing:0">(x,y) — shade where f &lt; 0</span></div>
         <div class="cf-input-row" id="cf-region-row">
-          <span class="cf-input-prefix">f &lt; 0 :</span>
-          <input type="text" id="cf-region-input" placeholder="e.g. x^2+y^2-0.5" autocomplete="off" spellcheck="false" />
+          <input type="text" id="cf-region-input" placeholder="e.g. x^2+y^2-1" autocomplete="off" spellcheck="false" />
           <button class="cf-clear-btn" id="cf-region-clear" title="Clear region">✕</button>
         </div>
         <div id="cf-region-error"></div>
@@ -210,7 +239,19 @@ document.body.innerHTML = `
       </div>
 
       <div class="cf-controls">
-        <div class="cf-section-label">Vectors</div>
+        <div class="cf-section-label">Physics</div>
+        <div class="cf-slider-group" id="cf-gamma-group">
+          <div class="cf-slider-label">
+            <span id="cf-gamma-label">Circulation Γ</span>
+            <span id="cf-gamma-val">0.0</span>
+          </div>
+          <input type="range" id="cf-gamma-slider" min="-12" max="12" step="0.25" value="0">
+          <div id="cf-gamma-hint" style="font-size:0.6rem;color:var(--dim);margin-top:2px;">select a cylinder or ellipse preset to enable</div>
+        </div>
+      </div>
+
+      <div class="cf-controls">
+        <div class="cf-section-label">Vectors &amp; particles</div>
         <div class="cf-toggle-row">
           <button class="cf-toggle-btn" id="cf-btn-vectors">Vector field</button>
           <button class="cf-toggle-btn" id="cf-btn-particles">Particles</button>
@@ -406,6 +447,7 @@ let regionFn = null;
 let currentF = null;   // compiled complex potential, kept for animation
 let currentRange = 3;
 let animFrameId = null;
+let circMode = null;  // null | 'z' | 'gw'
 
 // ─── Region helpers ───────────────────────────────────────────────────────────
 function compileRegion(expr) {
@@ -665,11 +707,40 @@ function buildStaticCache(f, W, H, range, nlines) {
   // draw axes onto oc_ctx
   drawAxesTo(oc_ctx, W, H, range);
 
-  // draw level curves onto oc_ctx
-  if(showStream) drawLevelCurvesTo(oc_ctx, imVals,GRID,W,H,imMin,imMax,nlines,'#4af0c8',0.85);
-  if(showEquip)  drawLevelCurvesTo(oc_ctx, reVals,GRID,W,H,reMin,reMax,nlines,'#f0a44a',0.5);
+  // draw level curves, clipped to exterior of obstacle if region is defined
+  if (regionFn) {
+    // build clip path: scan boundary pixels of region and use as clip
+    oc_ctx.save();
+    oc_ctx.beginPath();
+    // add full canvas rect then subtract obstacle via even-odd rule
+    oc_ctx.rect(0, 0, W, H);
+    // trace obstacle boundary at reduced resolution for clip path
+    const CS = 4; // clip step in pixels
+    let inPrev = false;
+    for (let py = 0; py < H; py += CS) {
+      for (let px = 0; px < W; px += CS) {
+        const x = (px/W-0.5)*2*range, y = -((py/H-0.5)*2*range);
+        const inNow = inRegion(x, y);
+        if (inNow && !inPrev) oc_ctx.moveTo(px, py);
+        if (inNow) oc_ctx.lineTo(px+CS, py);
+        inPrev = inNow;
+      }
+      inPrev = false;
+    }
+    oc_ctx.clip('evenodd');
+  }
 
-  // region overlay onto oc_ctx
+  if(showStream) {
+    drawLevelCurvesTo(oc_ctx, imVals,GRID,W,H,imMin,imMax,nlines,'#4af0c8',0.85,[]);
+    if(circMode) {
+      drawLevelCurvesTo(oc_ctx, imVals,GRID,W,H,imMin,imMax,0,'#4af0c8',1.0,[0]);
+    }
+  }
+  if(showEquip) drawLevelCurvesTo(oc_ctx, reVals,GRID,W,H,reMin,reMax,nlines,'#f0a44a',0.5,[]);
+
+  if (regionFn) oc_ctx.restore();
+
+  // region overlay on top to cover any boundary artifacts
   if (regionFn) {
     const tmp = document.createElement('canvas');
     tmp.width = W; tmp.height = H;
@@ -680,7 +751,7 @@ function buildStaticCache(f, W, H, range, nlines) {
       const x=(px/W-0.5)*2*range, y=-((py/H-0.5)*2*range);
       if (inRegion(x,y)) {
         const i=(py*W+px)*4;
-        d[i]=22; d[i+1]=28; d[i+2]=32; d[i+3]=195;
+        d[i]=22; d[i+1]=28; d[i+2]=32; d[i+3]=255;
       }
     }
     tc.putImageData(img,0,0);
@@ -706,6 +777,35 @@ function draw() {
     errEl.textContent = '⚠ ' + e.message;
     rowEl.classList.add('error');
     return;
+  }
+
+  // wrap with circulation term if Gamma != 0 and circMode is set
+  const gamma = parseFloat(document.getElementById('cf-gamma-slider').value);
+  if (circMode && gamma !== 0) {
+    const baseF = f;
+    const scale = -gamma / (2 * Math.PI); // coefficient of i*Log(...)
+    f = (z) => {
+      const base = baseF(z);
+      // compute log argument depending on mode
+      let logArg;
+      if (circMode === 'z') {
+        // normalize by R so Im(log(z/R)) = 0 on |z|=R boundary
+        const R = parseFloat(document.getElementById('cf-preset-select')
+          .options[document.getElementById('cf-preset-select').selectedIndex]
+          .dataset.circr || '1');
+        logArg = C.div(z, [R, 0]);
+      } else {
+        // circMode === 'gw': log(g(w)/R) where g(w) = (w + sqrt2(w))/2, R=2
+        const sw = C.sqrt2(z);
+        const gw = C.mul([0.5, 0], C.add(z, sw));
+        logArg = C.div(gw, [2, 0]);
+      }
+      // -i*Gamma/(2pi) * Log(logArg) = scale * i * Log(logArg)
+      const logVal = C.log(logArg);
+      // multiply by i*scale: i*scale * (a+ib) = (-scale*b, scale*a)
+      const circ = [-scale * logVal[1], scale * logVal[0]];
+      return C.add(base, circ);
+    };
   }
 
   currentF = f;
@@ -782,11 +882,18 @@ function drawAxesTo(c, W, H, range) {
   c.restore();
 }
 
-function drawLevelCurvesTo(c, vals,N,W,H,vmin,vmax,nlines,color,alpha){
+function drawLevelCurvesTo(c, vals,N,W,H,vmin,vmax,nlines,color,alpha,extraLevels){
   c.save();
-  c.strokeStyle=color; c.lineWidth=devicePixelRatio*1.2; c.globalAlpha=alpha;
-  for(let k=1;k<nlines;k++){
-    const level=vmin+(vmax-vmin)*k/nlines;
+  // build list of levels to draw
+  const levels = [];
+  for(let k=1;k<nlines;k++) levels.push(vmin+(vmax-vmin)*k/nlines);
+  if(extraLevels) for(const lv of extraLevels) levels.push(lv);
+
+  for(const level of levels){
+    const isExtra = extraLevels && extraLevels.includes(level);
+    c.strokeStyle = color;
+    c.lineWidth = devicePixelRatio * (isExtra ? 2.2 : 1.2);
+    c.globalAlpha = isExtra ? 1.0 : alpha;
     c.beginPath();
     for(let iy=0;iy<N-1;iy++){
       for(let ix=0;ix<N-1;ix++){
@@ -873,19 +980,35 @@ document.getElementById('cf-nlines-slider').addEventListener('input', function()
   document.getElementById('cf-nlines-val').textContent = this.value;
   draw();
 });
+document.getElementById('cf-gamma-slider').addEventListener('input', function(){
+  document.getElementById('cf-gamma-val').textContent = parseFloat(this.value).toFixed(1);
+  draw();
+});
 
-document.querySelectorAll('.cf-preset-btn').forEach(btn => {
-  btn.addEventListener('click', function(){
-    document.getElementById('cf-func-input').value = this.dataset.f;
-    const regionInput = document.getElementById('cf-region-input');
-    if (this.dataset.region) {
-      regionInput.value = this.dataset.region;
-    } else {
-      regionInput.value = '';
-    }
-    applyRegion();
-    draw();
-  });
+// initialize gamma group state
+document.getElementById('cf-gamma-group').classList.add('disabled');
+
+document.getElementById('cf-preset-select').addEventListener('change', function(){
+  const opt = this.options[this.selectedIndex];
+  const f = opt.dataset.f;
+  const region = opt.dataset.region || '';
+  const circ = opt.dataset.circ || null;
+  if (!f) return;
+  document.getElementById('cf-func-input').value = f;
+  document.getElementById('cf-region-input').value = region;
+  circMode = circ;
+  // reset gamma
+  document.getElementById('cf-gamma-slider').value = 0;
+  document.getElementById('cf-gamma-val').textContent = '0.0';
+  // enable/disable gamma group
+  const gammaGroup = document.getElementById('cf-gamma-group');
+  if (circMode) {
+    gammaGroup.classList.remove('disabled');
+  } else {
+    gammaGroup.classList.add('disabled');
+  }
+  applyRegion();
+  draw();
 });
 
 document.getElementById('cf-btn-stream').addEventListener('click', function(){
