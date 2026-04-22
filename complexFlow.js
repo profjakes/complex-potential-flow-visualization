@@ -469,9 +469,12 @@ function drawVectorField(f, W, H, range) {
     const {px, py, u, v, spd} = vec;
     if (!isFinite(spd) || spd < 1e-10) continue;
     const len = Math.min(1, spd/maxSpd) * maxArrow;
-    // canvas y is flipped
-    const ex = px + (u/spd)*len;
-    const ey = py - (v/spd)*len;
+    // scale math velocity to canvas pixels, accounting for aspect ratio
+    const sx = u * W/(2*range);
+    const sy = -v * H/(2*range);
+    const slen = Math.sqrt(sx*sx+sy*sy);
+    const ex = px + (sx/slen)*len;
+    const ey = py + (sy/slen)*len;
     const t = Math.min(1, spd/maxSpd);
     // color from dim teal to bright teal
     const r = Math.round(20 + t*54);
@@ -489,7 +492,7 @@ function drawVectorField(f, W, H, range) {
 
     // arrowhead
     const ang = Math.atan2(ey-py, ex-px);
-    const hs = Math.max(3, len*0.35) * devicePixelRatio;
+    const hs = Math.max(3, len*0.32);
     ctx.beginPath();
     ctx.moveTo(ex - hs*Math.cos(ang-0.4), ey - hs*Math.sin(ang-0.4));
     ctx.lineTo(ex, ey);
