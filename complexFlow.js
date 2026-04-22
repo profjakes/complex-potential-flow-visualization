@@ -173,8 +173,8 @@ document.body.innerHTML = `
         <button class="cf-preset-btn" data-f="log(z)"><span>log(z)</span><span class="cf-preset-name">line source</span></button>
         <button class="cf-preset-btn" data-f="1/z"><span>1/z</span><span class="cf-preset-name">doublet</span></button>
         <button class="cf-preset-btn" data-f="z + 1/z" data-region="x*x+y*y-1"><span>z + 1/z</span><span class="cf-preset-name">flow past cylinder R=1</span></button>
-        <button class="cf-preset-btn" data-f="exp(-i*pi/4)*z + 4*exp(i*pi/4)/z" data-region="x*x+y*y-4"><span>cylinder α=π/4</span><span class="cf-preset-name">cylinder R=2, angle of attack</span></button>
-        <button class="cf-preset-btn" data-f="(5+3*i)/(2*sqrt(2))*z+(-3-5*i)/(2*sqrt(2))*sqrt2(z)" data-region="x*x/6.25+y*y/2.25-1"><span>ellipse flow α=π/4</span><span class="cf-preset-name">ellipse a=5/2 b=3/2</span></button>
+        <button class="cf-preset-btn" data-f="exp(-i*pi/4)*z + 4*exp(i*pi/4)/z" data-region="x*x+y*y-3.9"><span>cylinder α=π/4</span><span class="cf-preset-name">cylinder R=2, angle of attack</span></button>
+        <button class="cf-preset-btn" data-f="(5+3*i)/(2*sqrt(2))*z+(-3-5*i)/(2*sqrt(2))*sqrt2(z)" data-region="x*x/6.25+y*y/2.25-0.95"><span>ellipse flow α=π/4</span><span class="cf-preset-name">ellipse a=5/2 b=3/2</span></button>
         <button class="cf-preset-btn" data-f="sin(z)"><span>sin(z)</span><span class="cf-preset-name">sinusoidal</span></button>
         <button class="cf-preset-btn" data-f="z^2 + 2*log(z)"><span>z² + 2·log(z)</span><span class="cf-preset-name">source in corner</span></button>
         <button class="cf-preset-btn" data-f="cosh(z)"><span>cosh(z)</span><span class="cf-preset-name">hyperbolic</span></button>
