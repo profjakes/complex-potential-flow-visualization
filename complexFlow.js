@@ -105,6 +105,16 @@ style.textContent = `
   #cf-gamma-group.disabled #cf-gamma-hint { display: block; }
   #cf-gamma-group:not(.disabled) #cf-gamma-hint { display: none; }
 
+  #cf-gamma-val[contenteditable] {
+    cursor: text; border-bottom: 1px dashed var(--dim);
+    padding: 0 2px; border-radius: 2px; min-width: 2em; text-align: right;
+    outline: none; transition: border-color 0.15s;
+  }
+  #cf-gamma-val[contenteditable]:focus {
+    border-bottom-color: var(--accent); color: var(--accent);
+    background: rgba(74,240,200,0.06);
+  }
+
   .cf-controls { display: flex; flex-direction: column; gap: 10px; }
   .cf-slider-group { display: flex; flex-direction: column; gap: 4px; }
   .cf-slider-label { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--dim); }
@@ -244,7 +254,7 @@ document.body.innerHTML = `
         <div class="cf-slider-group" id="cf-gamma-group">
           <div class="cf-slider-label">
             <span id="cf-gamma-label">Circulation Γ</span>
-            <span id="cf-gamma-val">0.0</span>
+            <span id="cf-gamma-val" contenteditable="true" spellcheck="false" title="Click to enter exact value">0.0</span>
           </div>
           <input type="range" id="cf-gamma-slider" min="-12" max="12" step="0.25" value="0">
           <div id="cf-gamma-hint" style="font-size:0.6rem;color:var(--dim);margin-top:2px;">select a cylinder or ellipse preset to enable</div>
@@ -1010,8 +1020,35 @@ document.getElementById('cf-nlines-slider').addEventListener('input', function()
   draw();
 });
 document.getElementById('cf-gamma-slider').addEventListener('input', function(){
-  document.getElementById('cf-gamma-val').textContent = parseFloat(this.value).toFixed(1);
+  document.getElementById('cf-gamma-val').textContent = parseFloat(this.value).toFixed(2);
   draw();
+});
+
+// contenteditable gamma value — allow keyboard entry of exact values
+const gammaVal = document.getElementById('cf-gamma-val');
+function applyGammaText() {
+  const v = parseFloat(gammaVal.textContent);
+  if (!isFinite(v)) { gammaVal.textContent = parseFloat(document.getElementById('cf-gamma-slider').value).toFixed(2); return; }
+  // clamp to extended range to allow Kutta values outside slider range
+  const clamped = Math.max(-50, Math.min(50, v));
+  gammaVal.textContent = clamped.toFixed(2);
+  // update slider (clamp to slider range)
+  const slider = document.getElementById('cf-gamma-slider');
+  slider.value = Math.max(parseFloat(slider.min), Math.min(parseFloat(slider.max), clamped));
+  draw();
+}
+gammaVal.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') { e.preventDefault(); this.blur(); }
+  if (e.key === 'Escape') { this.textContent = parseFloat(document.getElementById('cf-gamma-slider').value).toFixed(2); this.blur(); }
+});
+gammaVal.addEventListener('blur', applyGammaText);
+gammaVal.addEventListener('focus', function() {
+  // select all text on focus for easy replacement
+  const range = document.createRange();
+  range.selectNodeContents(this);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
 });
 
 // initialize gamma group state
@@ -1028,7 +1065,7 @@ document.getElementById('cf-preset-select').addEventListener('change', function(
   circMode = circ;
   // reset gamma
   document.getElementById('cf-gamma-slider').value = 0;
-  document.getElementById('cf-gamma-val').textContent = '0.0';
+  document.getElementById('cf-gamma-val').textContent = '0.00';
   // enable/disable gamma group
   const gammaGroup = document.getElementById('cf-gamma-group');
   if (circMode) {
