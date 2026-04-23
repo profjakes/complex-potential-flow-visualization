@@ -194,7 +194,7 @@ document.body.innerHTML = `
           <optgroup label="── Cylinders &amp; obstacles ──">
             <option value="" data-f="z + 1/z" data-region="x*x+y*y-0.95" data-circ="z" data-circr="1">cylinder  R=1, α=0</option>
             <option value="" data-f="exp(-i*pi/4)*z + 4*exp(i*pi/4)/z" data-region="x*x+y*y-3.85" data-circ="z" data-circr="2">cylinder  R=2, α=π/4</option>
-            <option value="" data-f="(z - i*sqrt(z^2-4))/sqrt(2)" data-region="" data-circ="gw" data-circr="1">flat plate  α=π/4</option>
+            <option value="" data-f="(z - i*sqrt2(z))/sqrt(2)" data-region="" data-circ="gw" data-circr="1">flat plate  α=π/4</option>
             <option value="" data-f="(5+3*i)/(2*sqrt(2))*z+(-3-5*i)/(2*sqrt(2))*sqrt2(z)" data-region="x*x/6.25+y*y/2.25-0.95" data-circ="gw" data-circr="2">ellipse  a=5/2, b=3/2, α=π/4</option>
           </optgroup>
           <optgroup label="── Other ──">
