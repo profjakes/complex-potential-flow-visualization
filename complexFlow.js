@@ -194,7 +194,8 @@ document.body.innerHTML = `
           <optgroup label="── Cylinders &amp; obstacles ──">
             <option value="" data-f="z + 1/z" data-region="x*x+y*y-0.95" data-circ="z" data-circr="1">cylinder  R=1, α=0</option>
             <option value="" data-f="exp(-i*pi/4)*z + 4*exp(i*pi/4)/z" data-region="x*x+y*y-3.85" data-circ="z" data-circr="2">cylinder  R=2, α=π/4</option>
-            <option value="" data-f="(5+3*i)/(2*sqrt(2))*z+(-3-5*i)/(2*sqrt(2))*sqrt2(z)" data-region="x*x/6.25+y*y/2.25-0.95" data-circ="gw">ellipse  a=5/2, b=3/2, α=π/4</option>
+            <option value="" data-f="(z - i*sqrt(z^2-4))/sqrt(2)" data-region="" data-circ="gw" data-circr="1">flat plate  α=π/4</option>
+            <option value="" data-f="(5+3*i)/(2*sqrt(2))*z+(-3-5*i)/(2*sqrt(2))*sqrt2(z)" data-region="x*x/6.25+y*y/2.25-0.95" data-circ="gw" data-circr="2">ellipse  a=5/2, b=3/2, α=π/4</option>
           </optgroup>
           <optgroup label="── Other ──">
             <option value="" data-f="sin(z)" data-region="">sinusoidal  (sin z)</option>
@@ -807,10 +808,13 @@ function draw() {
           .dataset.circr || '1');
         logArg = C.div(z, [R, 0]);
       } else {
-        // circMode === 'gw': log(g(w)/R) where g(w) = (w + sqrt2(w))/2, R=2
+        // circMode === 'gw': log(g(w)/R) where g(w) = (w + sqrt2(w))/2
+        const R = parseFloat(document.getElementById('cf-preset-select')
+          .options[document.getElementById('cf-preset-select').selectedIndex]
+          .dataset.circr || '1');
         const sw = C.sqrt2(z);
         const gw = C.mul([0.5, 0], C.add(z, sw));
-        logArg = C.div(gw, [2, 0]);
+        logArg = C.div(gw, [R, 0]);
       }
       // -i*Gamma/(2pi) * Log(logArg) = scale * i * Log(logArg)
       const logVal = C.log(logArg);
