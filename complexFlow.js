@@ -6,24 +6,40 @@
 // ─── Inject styles ────────────────────────────────────────────────────────────
 const style = document.createElement('style');
 style.textContent = `
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Fraunces:ital,wght@0,300;0,400;1,300&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
     --bg: #0a0c0f;
-    --bg-elev: #0d1014;
     --panel: #0f1215;
     --border: #1e2428;
-    --border-soft: #161a1e;
     --accent: #4af0c8;
-    --accent-soft: rgba(74,240,200,0.08);
     --accent2: #f0a44a;
     --text: #c8d4dc;
     --dim: #4a5a64;
-    --dim-2: #6b7a82;
     --error: #f05a4a;
   }
+
+  .light-mode {
+    --bg: #f5f2ed;
+    --panel: #ede9e2;
+    --border: #c8bfb0;
+    --accent: #007a5e;
+    --accent2: #9a5a00;
+    --text: #1a1410;
+    --dim: #8a7a6a;
+    --error: #c03020;
+  }
+
+  #cf-light-toggle {
+    margin-left: auto;
+    background: none; border: 1px solid var(--border);
+    color: var(--dim); font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; padding: 4px 10px; border-radius: 4px;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em;
+  }
+  #cf-light-toggle:hover { border-color: var(--accent); color: var(--accent); }
 
   html, body {
     background: var(--bg);
@@ -31,25 +47,20 @@ style.textContent = `
     font-family: 'JetBrains Mono', monospace;
     height: 100%;
     overflow: hidden;
-    -webkit-font-smoothing: antialiased;
   }
 
   #cf-root { display: flex; flex-direction: column; height: 100vh; }
 
   #cf-header {
-    padding: 14px 24px;
+    padding: 12px 24px;
     border-bottom: 1px solid var(--border);
     display: flex; align-items: baseline; gap: 16px; flex-shrink: 0;
-    background: linear-gradient(180deg, var(--bg-elev), var(--bg));
   }
   #cf-header h1 {
-    font-family: 'Fraunces', serif; font-weight: 400;
-    font-size: 1.15rem; letter-spacing: 0.04em; color: var(--accent);
+    font-family: 'Fraunces', serif; font-weight: 300;
+    font-size: 1.1rem; letter-spacing: 0.05em; color: var(--accent);
   }
-  #cf-header span {
-    font-size: 0.68rem; color: var(--dim);
-    letter-spacing: 0.18em; text-transform: uppercase;
-  }
+  #cf-header span { font-size: 0.7rem; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; }
 
   #cf-split { display: flex; flex: 1; overflow: hidden; }
 
@@ -57,60 +68,56 @@ style.textContent = `
     width: 320px; flex-shrink: 0;
     border-right: 1px solid var(--border);
     display: flex; flex-direction: column;
-    padding: 22px 20px; gap: 18px;
+    padding: 20px; gap: 16px;
     background: var(--panel);
     overflow-y: auto; overflow-x: hidden;
   }
-  #cf-left::-webkit-scrollbar { width: 6px; }
-  #cf-left::-webkit-scrollbar-track { background: transparent; }
-  #cf-left::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  #cf-left::-webkit-scrollbar-thumb:hover { background: var(--dim); }
+  #cf-left::-webkit-scrollbar { width: 4px; }
+  #cf-left::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
   .cf-section-label {
-    font-size: 0.62rem; letter-spacing: 0.18em;
-    text-transform: uppercase; color: var(--dim-2); margin-bottom: 6px;
+    font-size: 0.65rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--dim); margin-bottom: 4px;
   }
   .cf-input-group { display: flex; flex-direction: column; gap: 6px; }
   .cf-input-row {
     display: flex; align-items: center; gap: 8px;
     background: var(--bg); border: 1px solid var(--border);
-    border-radius: 5px; padding: 9px 12px;
-    transition: border-color 0.18s, box-shadow 0.18s;
+    border-radius: 4px; padding: 8px 12px; transition: border-color 0.2s;
   }
-  .cf-input-row:focus-within {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-  }
-  .cf-input-row.error {
-    border-color: var(--error);
-    box-shadow: 0 0 0 3px rgba(240,90,74,0.08);
-  }
-  .cf-input-prefix { font-size: 0.75rem; color: var(--dim-2); white-space: nowrap; }
+  .cf-input-row:focus-within { border-color: var(--accent); }
+  .cf-input-row.error { border-color: var(--error); }
+  .cf-input-prefix { font-size: 0.75rem; color: var(--dim); white-space: nowrap; }
 
   #cf-func-input, #cf-region-input {
     background: none; border: none; outline: none;
     color: var(--accent2); font-family: 'JetBrains Mono', monospace;
-    font-size: 0.92rem; flex: 1; min-width: 0;
+    font-size: 0.9rem; flex: 1; min-width: 0;
   }
-  #cf-region-input { color: var(--text); font-size: 0.82rem; }
-  #cf-region-input::placeholder { color: var(--dim); }
 
   #cf-error-msg, #cf-region-error { font-size: 0.7rem; color: var(--error); min-height: 1em; }
+
+  .cf-presets { display: flex; flex-direction: column; gap: 6px; }
+  .cf-preset-btn {
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; padding: 7px 12px; border-radius: 4px;
+    cursor: pointer; text-align: left; transition: all 0.15s;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .cf-preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .cf-preset-name { color: var(--dim); font-size: 0.65rem; }
 
   #cf-preset-select {
     width: 100%; background: var(--bg); border: 1px solid var(--border);
     color: var(--accent2); font-family: 'JetBrains Mono', monospace;
-    font-size: 0.82rem; padding: 9px 32px 9px 12px; border-radius: 5px;
-    outline: none; cursor: pointer;
-    transition: border-color 0.18s, box-shadow 0.18s;
+    font-size: 0.8rem; padding: 8px 10px; border-radius: 4px;
+    outline: none; cursor: pointer; transition: border-color 0.2s;
     appearance: none; -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234a5a64'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 12px center;
+    background-repeat: no-repeat; background-position: right 10px center;
   }
-  #cf-preset-select:hover { border-color: var(--dim); }
-  #cf-preset-select:focus {
-    border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
-  }
+  #cf-preset-select:focus { border-color: var(--accent); }
   #cf-preset-select optgroup { color: var(--dim); font-size: 0.65rem; }
   #cf-preset-select option { color: var(--accent2); background: var(--panel); font-size: 0.8rem; }
 
@@ -120,119 +127,71 @@ style.textContent = `
 
   #cf-gamma-val[contenteditable] {
     cursor: text; border-bottom: 1px dashed var(--dim);
-    padding: 0 3px; border-radius: 2px; min-width: 2.4em; text-align: right;
-    outline: none; transition: border-color 0.15s, color 0.15s, background 0.15s;
-    font-feature-settings: 'tnum';
+    padding: 0 2px; border-radius: 2px; min-width: 2em; text-align: right;
+    outline: none; transition: border-color 0.15s;
   }
-  #cf-gamma-val[contenteditable]:hover { border-bottom-color: var(--dim-2); color: var(--text); }
   #cf-gamma-val[contenteditable]:focus {
     border-bottom-color: var(--accent); color: var(--accent);
-    background: var(--accent-soft);
+    background: rgba(74,240,200,0.06);
   }
 
-  .cf-controls { display: flex; flex-direction: column; gap: 12px; }
-  .cf-slider-group { display: flex; flex-direction: column; gap: 6px; }
-  .cf-slider-label {
-    display: flex; justify-content: space-between;
-    font-size: 0.7rem; color: var(--dim-2);
-  }
-  .cf-slider-label span:last-child {
-    color: var(--text); font-feature-settings: 'tnum';
-  }
+  .cf-controls { display: flex; flex-direction: column; gap: 10px; }
+  .cf-slider-group { display: flex; flex-direction: column; gap: 4px; }
+  .cf-slider-label { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--dim); }
 
   input[type="range"] {
-    -webkit-appearance: none; width: 100%; height: 3px;
+    -webkit-appearance: none; width: 100%; height: 2px;
     background: var(--border); border-radius: 2px; outline: none;
-    cursor: pointer;
   }
   input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 14px; height: 14px;
+    -webkit-appearance: none; width: 12px; height: 12px;
     border-radius: 50%; background: var(--accent); cursor: pointer;
-    box-shadow: 0 0 0 0 var(--accent-soft);
-    transition: box-shadow 0.15s, transform 0.1s;
-  }
-  input[type="range"]::-webkit-slider-thumb:hover { box-shadow: 0 0 0 6px var(--accent-soft); }
-  input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.1); }
-  input[type="range"]::-moz-range-thumb {
-    width: 14px; height: 14px; border-radius: 50%;
-    background: var(--accent); border: none; cursor: pointer;
   }
 
-  .cf-toggle-row { display: flex; gap: 6px; }
+  .cf-toggle-row { display: flex; gap: 8px; }
   .cf-toggle-btn {
     flex: 1; background: var(--bg); border: 1px solid var(--border);
-    color: var(--dim-2); font-family: 'JetBrains Mono', monospace;
-    font-size: 0.68rem; padding: 7px 6px; border-radius: 4px;
-    cursor: pointer;
-    transition: border-color 0.15s, color 0.15s, background 0.15s;
-    text-align: center; letter-spacing: 0.02em;
+    color: var(--dim); font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; padding: 6px; border-radius: 4px;
+    cursor: pointer; transition: all 0.15s; text-align: center;
   }
-  .cf-toggle-btn:hover { color: var(--text); border-color: var(--dim); }
   .cf-toggle-btn.active {
-    border-color: var(--accent); color: var(--accent); background: var(--accent-soft);
+    border-color: var(--accent); color: var(--accent);
+    background: rgba(74,240,200,0.06);
   }
-
-  #cf-kutta-btn {
-    background: var(--accent-soft); border: 1px solid var(--accent);
-    color: var(--accent); font-family: 'JetBrains Mono', monospace;
-    font-size: 0.74rem; padding: 8px; border-radius: 4px; cursor: pointer;
-    transition: background 0.15s, transform 0.05s; letter-spacing: 0.05em;
-  }
-  #cf-kutta-btn:hover { background: rgba(74,240,200,0.18); }
-  #cf-kutta-btn:active { transform: translateY(1px); }
 
   #cf-draw-btn {
-    background: var(--accent-soft); border: 1px solid var(--accent);
+    background: rgba(74,240,200,0.1); border: 1px solid var(--accent);
     color: var(--accent); font-family: 'JetBrains Mono', monospace;
-    font-size: 0.78rem; letter-spacing: 0.18em; padding: 11px;
-    border-radius: 5px; cursor: pointer;
-    transition: background 0.18s, transform 0.05s;
+    font-size: 0.8rem; letter-spacing: 0.1em; padding: 10px;
+    border-radius: 4px; cursor: pointer; transition: all 0.2s;
     margin-top: auto; flex-shrink: 0;
   }
-  #cf-draw-btn:hover { background: rgba(74,240,200,0.18); }
-  #cf-draw-btn:active { transform: translateY(1px); }
+  #cf-draw-btn:hover { background: rgba(74,240,200,0.2); }
 
   #cf-right { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
   #cf-canvas-wrap { flex: 1; position: relative; overflow: hidden; }
-  #cf-canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+  #cf-canvas { display: block; width: 100%; height: 100%; }
 
   #cf-legend {
-    position: absolute; top: 14px; right: 18px;
-    font-size: 0.66rem; color: var(--dim-2);
-    text-align: right; line-height: 1.9;
-    font-family: 'JetBrains Mono', monospace;
-    pointer-events: none;
-    background: rgba(10,12,15,0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    padding: 7px 11px; border-radius: 4px;
-    border: 1px solid var(--border-soft);
+    position: absolute; top: 12px; right: 16px;
+    font-size: 0.65rem; color: var(--dim);
+    text-align: right; line-height: 1.8; font-family: 'JetBrains Mono', monospace;
   }
   #cf-legend .stream { color: var(--accent); }
   #cf-legend .equip  { color: var(--accent2); }
 
   #cf-coords {
-    position: absolute; bottom: 14px; right: 18px;
-    font-size: 0.7rem; color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    background: rgba(10,12,15,0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    padding: 8px 12px; border-radius: 4px;
-    border: 1px solid var(--border-soft);
-    line-height: 1.65; pointer-events: none;
-    min-width: 195px;
+    position: absolute; bottom: 12px; right: 16px;
+    font-size: 0.65rem; color: var(--dim); font-family: 'JetBrains Mono', monospace;
   }
-  #cf-coords .label { color: var(--dim-2); }
-  #cf-coords .val   { font-feature-settings: 'tnum'; }
 
   .cf-clear-btn {
     background: none; border: none; color: var(--dim);
-    font-family: 'JetBrains Mono', monospace; font-size: 0.74rem;
-    cursor: pointer; padding: 2px 5px; border-radius: 3px;
-    transition: color 0.15s, background 0.15s;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    cursor: pointer; padding: 2px 4px; border-radius: 3px; transition: color 0.15s;
   }
-  .cf-clear-btn:hover { color: var(--error); background: rgba(240,90,74,0.08); }
+  .cf-clear-btn:hover { color: var(--error); }
 `;
 document.head.appendChild(style);
 
@@ -242,6 +201,7 @@ document.body.innerHTML = `
   <header id="cf-header">
     <h1>Complex Potential Flow</h1>
     <span>streamline visualizer</span>
+    <button id="cf-light-toggle">☀ light mode</button>
   </header>
   <div id="cf-split">
     <div id="cf-left">
@@ -251,8 +211,9 @@ document.body.innerHTML = `
         <select id="cf-preset-select">
           <optgroup label="── Basic flows ──">
             <option value="" data-f="z" data-region="">uniform flow</option>
-            <option value="" data-f="z^2" data-region="">stagnation flow  (π/2 corner)</option>
-            <option value="" data-f="z^(pi/3*3/pi*3)" data-region="">wedge π/3  (w³)</option>
+            <option value="" data-f="z^2" data-region="">stagnation flow</option>
+            <option value="" data-f="z^2" data-region="">corner flow π/2  (z²)</option>
+            <option value="" data-f="z^3" data-region="">wedge π/3  (z³)</option>
             <option value="" data-f="exp(z)" data-region="">channel flow  (eʷ)</option>
           </optgroup>
           <optgroup label="── Sources / sinks ──">
@@ -292,7 +253,7 @@ document.body.innerHTML = `
           <div class="cf-slider-label"><span>α (angle of attack)</span><span id="cf-jalpha-val">0.10</span></div>
           <input type="range" id="cf-jalpha-slider" min="-0.5" max="0.5" step="0.01" value="0.1">
         </div>
-        <button id="cf-kutta-btn">✦ Apply Kutta condition</button>
+        <button id="cf-kutta-btn" style="background:rgba(74,240,200,0.08);border:1px solid var(--accent);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:0.75rem;padding:7px;border-radius:4px;cursor:pointer;transition:all 0.15s;letter-spacing:0.05em;">✦ Apply Kutta condition</button>
       </div>
 
       <div class="cf-input-group">
@@ -372,12 +333,7 @@ document.body.innerHTML = `
           <div class="stream">— streamlines (Im f = const)</div>
           <div class="equip" id="cf-leg-equip">— equipotentials (Re f = const)</div>
         </div>
-        <div id="cf-coords">
-          <div><span class="label">z    = </span><span class="val" id="cf-coord-z">—</span></div>
-          <div><span class="label">f(z) = </span><span class="val" id="cf-coord-fz">—</span></div>
-          <div><span class="label">|f|  = </span><span class="val" id="cf-coord-abs">—</span></div>
-          <div><span class="label">arg  = </span><span class="val" id="cf-coord-arg">—</span></div>
-        </div>
+        <div id="cf-coords"></div>
       </div>
     </div>
   </div>
@@ -410,7 +366,6 @@ const C = {
   cosh: ([a,b]) => [Math.cosh(a)*Math.cos(b), Math.sinh(a)*Math.sin(b)],
   tanh: (z) => C.div(C.sinh(z),C.cosh(z)),
   sqrt: (z) => C.pow(z,0.5),
-  // sqrt(z^2 - 4) with branch chosen so dot(z, sqrt2) >= 0 (same side as z)
   sqrt2: (z) => {
     const a = z[0]*z[0]-z[1]*z[1]-4, b = 2*z[0]*z[1];
     const r = Math.sqrt(a*a+b*b);
@@ -418,6 +373,7 @@ const C = {
     const mag = Math.sqrt(r);
     const re = mag*Math.cos(theta/2);
     const im = mag*Math.sin(theta/2);
+    // choose branch so that Re(conj(z) * sqrt) > 0, i.e. same direction as z
     const dot = z[0]*re + z[1]*im;
     return dot >= 0 ? [re,im] : [-re,-im];
   },
@@ -529,6 +485,12 @@ function evalNode(node, z) {
   }
 }
 
+function isLightMode() { return document.documentElement.classList.contains('light-mode'); }
+function streamColor() { return isLightMode() ? '#1a5070' : '#4af0c8'; }
+function equipColor()  { return isLightMode() ? '#904010' : '#f0a44a'; }
+function obstacleRGB() { return isLightMode() ? [210,205,195] : [22,28,32]; }
+function canvasBg()    { return isLightMode() ? '#ffffff' : '#0a0c0f'; }
+
 function compileFn(expr) {
   const ast = new ComplexParser(expr).parse();
   return z => evalNode(ast, z);
@@ -541,7 +503,9 @@ function getJoukowskiParams() {
   const b     = parseFloat(document.getElementById('cf-jb-slider').value);
   const alpha = parseFloat(document.getElementById('cf-jalpha-slider').value);
   const gamma = parseFloat(document.getElementById('cf-gamma-val').textContent);
+  // center of circle: z0 = -a + ib, passes through z=R
   const z0r = -a, z0i = b;
+  // radius of circle
   const rho = Math.sqrt((R - z0r)**2 + z0i**2);
   return { R, a, b, alpha, gamma, z0r, z0i, rho };
 }
@@ -556,27 +520,35 @@ function buildJoukowskiFn(gamma) {
   const { R, alpha, z0r, z0i, rho } = getJoukowskiParams();
   const cosA = Math.cos(alpha), sinA = Math.sin(alpha);
   return (w) => {
+    // g(w) = (w + sqrt(w^2 - 4R^2)) / 2 — pick branch with |g| > R
     const wr = w[0], wi = w[1];
     const ar = wr*wr - wi*wi - 4*R*R, ai = 2*wr*wi;
     const sr = Math.sqrt(ar*ar + ai*ai);
     const stheta = Math.atan2(ai, ar);
     const smag = Math.sqrt(sr);
     let sqr = smag*Math.cos(stheta/2), sqi = smag*Math.sin(stheta/2);
+    // two roots: (w+sq)/2 and (w-sq)/2, their product = R^2
+    // pick the one with larger modulus (|g| > R)
     const zr1 = (wr+sqr)/2, zi1 = (wi+sqi)/2;
     const zr2 = (wr-sqr)/2, zi2 = (wi-sqi)/2;
     const mod1 = zr1*zr1+zi1*zi1, mod2 = zr2*zr2+zi2*zi2;
     const zr = mod1 >= mod2 ? zr1 : zr2;
     const zi = mod1 >= mod2 ? zi1 : zi2;
 
+    // z - z0
     const dzr = zr - z0r, dzi = zi - z0i;
     const dz2 = dzr*dzr + dzi*dzi;
 
+    // term1 = dz * e^{-ia} = (dzr+i*dzi)*(cosA - i*sinA)
     const t1r = dzr*cosA + dzi*sinA, t1i = dzi*cosA - dzr*sinA;
+    // term2 = rho^2 * e^{ia} / dz = rho^2 * (cosA+i*sinA) * (dzr-i*dzi) / dz2
     const r2 = rho*rho / dz2;
     const t2r = r2*(dzr*cosA + dzi*sinA), t2i = r2*(dzi*cosA - dzr*sinA);
+    // term3 = -iGamma/(2pi) * log(dz/rho)
     const logMag = Math.log(Math.sqrt(dz2) / rho);
     const logArg = Math.atan2(dzi, dzr);
     const scale = gamma / (2 * Math.PI);
+    // -i*scale*(logMag + i*logArg) = scale*logArg - i*scale*logMag
     const t3r = scale * logArg, t3i = -scale * logMag;
 
     return [t1r + t2r + t3r, t1i + t2i + t3i];
@@ -585,6 +557,8 @@ function buildJoukowskiFn(gamma) {
 
 function buildJoukowskiRegion() {
   const { R, z0r, z0i, rho } = getJoukowskiParams();
+  // region is inside the Joukowski image of the circle
+  // we check by inverting: given w, compute z=g(w), check if |z-z0| < rho
   return (x, y) => {
     const wr = x, wi = y;
     const ar = wr*wr - wi*wi - 4*R*R, ai = 2*wr*wi;
@@ -628,16 +602,14 @@ function inRegion(x, y) {
   try { return regionFn(x, y) < 0; } catch(e) { return false; }
 }
 
-// ─── Velocity from f (centered difference for symmetry & accuracy) ───────────
-// w = df/dz = u - iv  =>  u = Re(w), v = -Im(w)
+// ─── Velocity from f (complex derivative df/dz, centered differences) ─────────
 function velocity(f, x, y) {
   const h = 1e-4;
   try {
-    const fp = f([x+h, y]);
-    const fm = f([x-h, y]);
-    const dwRe = (fp[0]-fm[0])/(2*h);
-    const dwIm = (fp[1]-fm[1])/(2*h);
-    return [dwRe, -dwIm];
+    const fxp = f([x+h, y]), fxm = f([x-h, y]);
+    const u =  (fxp[0]-fxm[0])/(2*h);
+    const v = -(fxp[1]-fxm[1])/(2*h);
+    return [u, v];
   } catch(e) { return [0,0]; }
 }
 
@@ -647,6 +619,7 @@ function drawVectorField(f, W, H, range) {
   const dx = W/COLS, dy = H/ROWS;
   const maxArrow = Math.min(dx, dy) * 0.42;
 
+  // collect all speeds to normalize
   const vecs = [];
   let maxSpd = 0;
   for (let row = 0; row < ROWS; row++) {
@@ -657,26 +630,25 @@ function drawVectorField(f, W, H, range) {
       if (inRegion(x,y)) { vecs.push(null); continue; }
       const [u,v] = velocity(f, x, y);
       const spd = Math.sqrt(u*u+v*v);
-      if (isFinite(spd) && spd > maxSpd) maxSpd = spd;
+      if (spd > maxSpd) maxSpd = spd;
       vecs.push({px, py, u, v, spd});
     }
   }
 
   ctx.save();
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
   for (const vec of vecs) {
     if (!vec) continue;
     const {px, py, u, v, spd} = vec;
     if (!isFinite(spd) || spd < 1e-10) continue;
-    const t = Math.min(1, spd/maxSpd);
-    const len = t * maxArrow;
+    const len = Math.min(1, spd/maxSpd) * maxArrow;
+    // scale math velocity to canvas pixels, accounting for aspect ratio
     const sx = u * W/(2*range);
     const sy = -v * H/(2*range);
     const slen = Math.sqrt(sx*sx+sy*sy);
-    if (slen < 1e-12) continue;
     const ex = px + (sx/slen)*len;
     const ey = py + (sy/slen)*len;
+    const t = Math.min(1, spd/maxSpd);
+    // color from dim teal to bright teal
     const r = Math.round(20 + t*54);
     const g = Math.round(80 + t*160);
     const b = Math.round(80 + t*120);
@@ -684,11 +656,13 @@ function drawVectorField(f, W, H, range) {
     ctx.lineWidth = devicePixelRatio * 1.0;
     ctx.globalAlpha = 0.55 + 0.4*t;
 
+    // shaft
     ctx.beginPath();
     ctx.moveTo(px, py);
     ctx.lineTo(ex, ey);
     ctx.stroke();
 
+    // arrowhead
     const ang = Math.atan2(ey-py, ex-px);
     const hs = Math.max(3, len*0.32);
     ctx.beginPath();
@@ -713,6 +687,7 @@ function initParticles(count, range) {
 }
 
 function makeParticle(range) {
+  // store position in math coords (x right, y up)
   const _r = range || currentRange || 3;
   return {
     mx: (Math.random()-0.5)*2*_r,
@@ -724,8 +699,8 @@ function makeParticle(range) {
 }
 
 function stepParticles(f, W, H, range, speedMult) {
+  // Work entirely in math coords (x: right, y: up).
   const dt = 0.06 * speedMult;
-  const trailLen = getTrailLen();
 
   for (const p of particles) {
     p.age++;
@@ -734,16 +709,19 @@ function stepParticles(f, W, H, range, speedMult) {
     const mx = p.mx, my = p.my;
     if (inRegion(mx, my)) { Object.assign(p, makeParticle(range)); continue; }
 
+    // push canvas-coord position into trail
     const px =  (mx / (2*range) + 0.5) * W;
     const py = (-my / (2*range) + 0.5) * H;
     p.trail.push([px, py]);
-    if (p.trail.length > trailLen) p.trail.shift();
+    if (p.trail.length > getTrailLen()) p.trail.shift();
 
+    // velocity at current math position
     const [u, v] = velocity(f, mx, my);
     if (!isFinite(u) || !isFinite(v)) { Object.assign(p, makeParticle(range)); continue; }
     const spd = Math.sqrt(u*u + v*v);
     if (spd < 1e-10) { p.age = p.maxAge; continue; }
 
+    // RK2 step in math coords
     const k = dt / spd;
     const mx2 = mx + k*u, my2 = my + k*v;
     const [u2, v2] = velocity(f, mx2, my2);
@@ -753,6 +731,7 @@ function stepParticles(f, W, H, range, speedMult) {
     p.mx += 0.5*dt*(u/spd + u2/spd2);
     p.my += 0.5*dt*(v/spd + v2/spd2);
 
+    // recycle if out of view
     if (Math.abs(p.mx) > range*1.05 || Math.abs(p.my) > range*1.05) {
       Object.assign(p, makeParticle(range));
     }
@@ -761,38 +740,32 @@ function stepParticles(f, W, H, range, speedMult) {
 
 function drawParticles() {
   ctx.save();
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
   for (const p of particles) {
     if (p.trail.length < 2) continue;
     const fade = Math.min(1, p.age / 20);
     for (let i = 1; i < p.trail.length; i++) {
       const t = i / p.trail.length;
       ctx.globalAlpha = t * fade * 0.85;
-      ctx.strokeStyle = '#4af0c8';
+      ctx.strokeStyle = streamColor();
       ctx.lineWidth = devicePixelRatio * (0.8 + t*0.8);
+      ctx.lineJoin = 'round';
       ctx.beginPath();
       ctx.moveTo(p.trail[i-1][0], p.trail[i-1][1]);
       ctx.lineTo(p.trail[i][0],   p.trail[i][1]);
       ctx.stroke();
     }
-    const [hx, hy] = p.trail[p.trail.length-1];
-    ctx.globalAlpha = fade * 0.95;
-    ctx.fillStyle = '#9ff8e2';
-    ctx.beginPath();
-    ctx.arc(hx, hy, devicePixelRatio*1.6, 0, Math.PI*2);
-    ctx.fill();
+    // dot at head
+    if (p.trail.length > 0) {
+      const [hx, hy] = p.trail[p.trail.length-1];
+      ctx.globalAlpha = fade * 0.9;
+      ctx.fillStyle = streamColor();
+      ctx.beginPath();
+      ctx.arc(hx, hy, devicePixelRatio*1.5, 0, Math.PI*2);
+      ctx.fill();
+    }
   }
   ctx.globalAlpha = 1;
   ctx.restore();
-}
-
-// ─── Domain coloring helper (hue=arg(f), L=banded log|f|) ────────────────────
-function hslToRgb(h, s, l) {
-  const k = n => (n + h*12) % 12;
-  const a = s * Math.min(l, 1-l);
-  const f = n => l - a * Math.max(-1, Math.min(k(n)-3, 9-k(n), 1));
-  return [f(0)*255, f(8)*255, f(4)*255];
 }
 
 // ─── Static draw (level curves etc) ──────────────────────────────────────────
@@ -804,6 +777,7 @@ function resizeCanvas() {
   canvas.style.height = wrap.clientHeight + 'px';
 }
 
+// Cached static layer (streamlines, axes, region) drawn to an offscreen canvas
 let staticCache = null;
 
 function buildStaticCache(f, W, H, range, nlines) {
@@ -811,7 +785,7 @@ function buildStaticCache(f, W, H, range, nlines) {
   oc.width = W; oc.height = H;
   const oc_ctx = oc.getContext('2d');
 
-  oc_ctx.fillStyle='#0a0c0f';
+  oc_ctx.fillStyle = canvasBg();
   oc_ctx.fillRect(0,0,W,H);
 
   const GRID=400;
@@ -831,124 +805,112 @@ function buildStaticCache(f, W, H, range, nlines) {
     }
   }
 
-  // percentile-based contour range so streamlines concentrate near features
+  // fast percentile using partial histogram rather than full sort
   function percentileRange(vals, loP, hiP) {
-    const finite = Array.from(vals).filter(isFinite).sort((a,b)=>a-b);
-    if (!finite.length) return [0, 1];
-    const lo = finite[Math.floor(loP * finite.length)];
-    const hi = finite[Math.floor(hiP * finite.length)];
+    let mn=Infinity, mx=-Infinity;
+    for(let i=0;i<vals.length;i++){const v=vals[i];if(isFinite(v)){if(v<mn)mn=v;if(v>mx)mx=v;}}
+    if(!isFinite(mn)) return [0,1];
+    const BINS=1000, scale=(BINS-1)/(mx-mn);
+    const hist=new Int32Array(BINS);
+    for(let i=0;i<vals.length;i++){const v=vals[i];if(isFinite(v))hist[Math.round((v-mn)*scale)]++;}
+    const total=vals.length;
+    let cum=0, lo=mn, hi=mx, loFound=false;
+    for(let b=0;b<BINS;b++){
+      cum+=hist[b];
+      if(!loFound && cum/total>=loP){lo=mn+b/scale;loFound=true;}
+      if(cum/total>=hiP){hi=mn+b/scale;break;}
+    }
     return [lo, hi];
   }
   const [imLo, imHi] = percentileRange(imVals, 0.05, 0.95);
   const [reLo, reHi] = percentileRange(reVals, 0.05, 0.95);
 
-  // domain coloring (hue from arg(f), lightness banded by log2|f|),
-  // sampled by bilinear interpolation from the GRID×GRID we just built.
-  if (showColor) {
-    const img = oc_ctx.createImageData(W, H);
-    const data32 = new Uint32Array(img.data.buffer);
-    const TWO_PI = Math.PI*2;
-    for (let py=0; py<H; py++) {
-      const gy = (py/(H-1)) * (GRID-1);
-      const iy0 = Math.floor(gy), fy = gy - iy0;
-      const iy1 = Math.min(iy0+1, GRID-1);
-      for (let px=0; px<W; px++) {
-        const gx = (px/(W-1)) * (GRID-1);
-        const ix0 = Math.floor(gx), fx = gx - ix0;
-        const ix1 = Math.min(ix0+1, GRID-1);
-
-        const i00 = iy0*GRID+ix0, i10 = iy0*GRID+ix1;
-        const i01 = iy1*GRID+ix0, i11 = iy1*GRID+ix1;
-        const re = (1-fx)*(1-fy)*reVals[i00] + fx*(1-fy)*reVals[i10]
-                 + (1-fx)*fy   *reVals[i01] + fx*fy   *reVals[i11];
-        const im = (1-fx)*(1-fy)*imVals[i00] + fx*(1-fy)*imVals[i10]
-                 + (1-fx)*fy   *imVals[i01] + fx*fy   *imVals[i11];
-
-        if (!isFinite(re) || !isFinite(im)) {
-          data32[py*W+px] = 0xFF0a0c0f; continue;
+  if(showColor){
+    const light = isLightMode();
+    const img=oc_ctx.createImageData(W,H);
+    for(let py=0;py<H;py++){
+      for(let px=0;px<W;px++){
+        const x=(px/W-0.5)*2*range, y=-((py/H-0.5)*2*range);
+        let fz; try{fz=f([x,y]);}catch(e){fz=[0,0];}
+        const t=Math.max(0,Math.min(1,(fz[1]-imLo)/(imHi-imLo+1e-10)));
+        const i=(py*W+px)*4;
+        if (light) {
+          img.data[i]=220-t*180; img.data[i+1]=215-t*160; img.data[i+2]=200-t*140; img.data[i+3]=255;
+        } else {
+          img.data[i]=5+t*20; img.data[i+1]=20+t*40; img.data[i+2]=25+t*50; img.data[i+3]=255;
         }
-        const arg = Math.atan2(im, re);
-        const h = ((arg + Math.PI) / TWO_PI);
-        const mag = Math.sqrt(re*re + im*im);
-        let l;
-        if (mag === 0) l = 0.04;
-        else {
-          const band = Math.log2(mag);
-          const frac = band - Math.floor(band);
-          l = 0.18 + 0.22 * frac;
-        }
-        const [r, g, b] = hslToRgb(h, 0.65, l);
-        data32[py*W+px] = (255<<24) | (b<<16) | (g<<8) | r;
       }
     }
-    oc_ctx.putImageData(img, 0, 0);
+    oc_ctx.putImageData(img,0,0);
   }
 
+  // draw axes onto oc_ctx
   drawAxesTo(oc_ctx, W, H, range);
 
+  // draw level curves, clipped to exterior of obstacle if region is defined
   if (regionFn) {
-    const mask = document.createElement('canvas');
-    mask.width = W; mask.height = H;
-    const mc = mask.getContext('2d');
-    const mimg = mc.createImageData(W, H);
-    const md = mimg.data;
+    // Single pixel pass: build both the mask (for destination-out) and overlay simultaneously
+    const combined = document.createElement('canvas');
+    combined.width = W; combined.height = H;
+    const cc = combined.getContext('2d');
+    const cimg = cc.createImageData(W, H);
+    const cd = cimg.data;
+    const [or, og, ob] = obstacleRGB();
     for (let py = 0; py < H; py++) {
       for (let px = 0; px < W; px++) {
         const x = (px/W-0.5)*2*range, y = -((py/H-0.5)*2*range);
         if (inRegion(x, y)) {
           const i = (py*W+px)*4;
-          md[i]=255; md[i+1]=255; md[i+2]=255; md[i+3]=255;
+          cd[i]=255; cd[i+1]=255; cd[i+2]=255; cd[i+3]=255; // white mask
         }
       }
     }
-    mc.putImageData(mimg, 0, 0);
+    cc.putImageData(cimg, 0, 0);
 
+    // draw level curves to temp canvas then erase interior
     const lc = document.createElement('canvas');
     lc.width = W; lc.height = H;
     const lctx = lc.getContext('2d');
     if(showStream) {
-      drawLevelCurvesTo(lctx, imVals,GRID,W,H,imLo,imHi,nlines,'#4af0c8',0.85,[]);
+      drawLevelCurvesTo(lctx, imVals,GRID,W,H,imLo,imHi,nlines,streamColor(),0.85,[]);
       if(circMode && circMode !== 'joukowski') {
-        drawLevelCurvesTo(lctx, imVals,GRID,W,H,imLo,imHi,0,'#4af0c8',1.0,[0]);
+        drawLevelCurvesTo(lctx, imVals,GRID,W,H,imLo,imHi,0,streamColor(),1.0,[0]);
       }
     }
-    if(showEquip) drawLevelCurvesTo(lctx, reVals,GRID,W,H,reLo,reHi,nlines,'#f0a44a',0.5,[]);
+    if(showEquip) drawLevelCurvesTo(lctx, reVals,GRID,W,H,reLo,reHi,nlines,equipColor(),0.5,[]);
     lctx.globalCompositeOperation = 'destination-out';
-    lctx.drawImage(mask, 0, 0);
+    lctx.drawImage(combined, 0, 0);
     lctx.globalCompositeOperation = 'source-over';
     oc_ctx.drawImage(lc, 0, 0);
+
+    // draw obstacle fill using same combined canvas, recolored
+    const oimg = cc.createImageData(W, H);
+    const od = oimg.data;
+    for (let py = 0; py < H; py++) {
+      for (let px = 0; px < W; px++) {
+        const x = (px/W-0.5)*2*range, y = -((py/H-0.5)*2*range);
+        if (inRegion(x, y)) {
+          const i = (py*W+px)*4;
+          od[i]=or; od[i+1]=og; od[i+2]=ob; od[i+3]=255;
+        }
+      }
+    }
+    cc.putImageData(oimg, 0, 0);
+    oc_ctx.drawImage(combined, 0, 0);
   } else {
     if(showStream) {
-      drawLevelCurvesTo(oc_ctx, imVals,GRID,W,H,imLo,imHi,nlines,'#4af0c8',0.85,[]);
+      drawLevelCurvesTo(oc_ctx, imVals,GRID,W,H,imLo,imHi,nlines,streamColor(),0.85,[]);
       if(circMode && circMode !== 'joukowski') {
-        drawLevelCurvesTo(oc_ctx, imVals,GRID,W,H,imLo,imHi,0,'#4af0c8',1.0,[0]);
+        drawLevelCurvesTo(oc_ctx, imVals,GRID,W,H,imLo,imHi,0,streamColor(),1.0,[0]);
       }
     }
-    if(showEquip) drawLevelCurvesTo(oc_ctx, reVals,GRID,W,H,reLo,reHi,nlines,'#f0a44a',0.5,[]);
-  }
-
-  if (regionFn) {
-    const tmp = document.createElement('canvas');
-    tmp.width = W; tmp.height = H;
-    const tc = tmp.getContext('2d');
-    const img = tc.createImageData(W, H);
-    const d = img.data;
-    for (let py=0; py<H; py++) for (let px=0; px<W; px++) {
-      const x=(px/W-0.5)*2*range, y=-((py/H-0.5)*2*range);
-      if (inRegion(x,y)) {
-        const i=(py*W+px)*4;
-        d[i]=22; d[i+1]=28; d[i+2]=32; d[i+3]=255;
-      }
-    }
-    tc.putImageData(img,0,0);
-    oc_ctx.drawImage(tmp,0,0);
+    if(showEquip) drawLevelCurvesTo(oc_ctx, reVals,GRID,W,H,reLo,reHi,nlines,equipColor(),0.5,[]);
   }
 
   return oc;
 }
 
-// ─── Top-level draw orchestration ─────────────────────────────────────────────
-function fullDraw() {
+function draw() {
   stopAnimation();
   resizeCanvas();
   const errEl  = document.getElementById('cf-error-msg');
@@ -973,7 +935,8 @@ function fullDraw() {
       rowEl.classList.add('error');
       return;
     }
-    const gamma = parseFloat(document.getElementById('cf-gamma-slider').value);
+    // wrap with circulation term if Gamma != 0 and circMode is set
+    const gamma = parseFloat(document.getElementById('cf-gamma-val').textContent) || 0;
     if (circMode && gamma !== 0) {
       const baseF = f;
       const scale = -gamma / (2 * Math.PI);
@@ -1019,19 +982,6 @@ function fullDraw() {
   }
 }
 
-function redrawStatic() {
-  if (!currentF) { fullDraw(); return; }
-  currentRange = parseFloat(document.getElementById('cf-range-slider').value);
-  const nlines = parseInt(document.getElementById('cf-nlines-slider').value);
-  const W = canvas.width, H = canvas.height;
-  staticCache = buildStaticCache(currentF, W, H, currentRange, nlines);
-  if (!showParticles) {
-    ctx.clearRect(0,0,W,H);
-    ctx.drawImage(staticCache, 0, 0);
-    if (showVectors) drawVectorField(currentF, W, H, currentRange);
-  }
-}
-
 // ─── Animation loop ───────────────────────────────────────────────────────────
 function startAnimation() {
   if (animFrameId) return;
@@ -1040,6 +990,7 @@ function startAnimation() {
     const W = canvas.width, H = canvas.height;
     const speed = parseFloat(document.getElementById('cf-speed-slider').value);
 
+    // restore static layer
     ctx.clearRect(0,0,W,H);
     if (staticCache) ctx.drawImage(staticCache, 0, 0);
     if (showVectors) drawVectorField(currentF, W, H, currentRange);
@@ -1057,22 +1008,26 @@ function stopAnimation() {
   particles = [];
 }
 
-// ─── Axis / curve helpers ────────────────────────────────────────────────────
+// ─── Axis / curve helpers that accept a context argument ─────────────────────
 function drawAxesTo(c, W, H, range) {
   const cx=W/2, cy=H/2, sx=W/(2*range), sy=H/(2*range);
+  const light = isLightMode();
+  const gridCol  = light ? '#c0b8a8' : '#1e2428';
+  const axisCol  = light ? '#8a7a6a' : '#2e3c44';
+  const labelCol = light ? '#6a5a4a' : '#3a4e58';
   c.save();
   const step=niceStep(range);
-  c.strokeStyle='#1e2428'; c.lineWidth=1; c.setLineDash([1,4]);
+  c.strokeStyle=gridCol; c.lineWidth=1; c.setLineDash([1,4]);
   for(let v=-range;v<=range;v+=step){
     const px=cx+v*sx, py=cy-v*sy;
     c.beginPath();c.moveTo(px,0);c.lineTo(px,H);c.stroke();
     c.beginPath();c.moveTo(0,py);c.lineTo(W,py);c.stroke();
   }
   c.setLineDash([]);
-  c.strokeStyle='#2e3c44'; c.lineWidth=1.5;
+  c.strokeStyle=axisCol; c.lineWidth=1.5;
   c.beginPath();c.moveTo(cx,0);c.lineTo(cx,H);c.stroke();
   c.beginPath();c.moveTo(0,cy);c.lineTo(W,cy);c.stroke();
-  c.fillStyle='#3a4e58';
+  c.fillStyle=labelCol;
   c.font=`${10*devicePixelRatio}px JetBrains Mono,monospace`;
   c.textAlign='center';
   for(let v=-range+step;v<range;v+=step){
@@ -1088,15 +1043,18 @@ function drawAxesTo(c, W, H, range) {
 
 function drawLevelCurvesTo(c, vals,N,W,H,vmin,vmax,nlines,color,alpha,extraLevels){
   c.save();
-  c.lineCap='round'; c.lineJoin='round';
+  // build list of levels to draw
   const levels = [];
+  // main levels spaced within [vmin, vmax]
   for(let k=1;k<nlines;k++) levels.push(vmin+(vmax-vmin)*k/nlines);
   if(extraLevels) for(const lv of extraLevels) levels.push(lv);
 
+  // also find true data min/max for corner fill
   let dmin=Infinity, dmax=-Infinity;
   for(let i=0;i<vals.length;i++){
     if(isFinite(vals[i])){ if(vals[i]<dmin)dmin=vals[i]; if(vals[i]>dmax)dmax=vals[i]; }
   }
+  // add sparse levels below vmin and above vmax to fill corners
   const nCorner = Math.max(3, Math.floor(nlines/6));
   for(let k=1;k<=nCorner;k++){
     levels.push(dmin+(vmin-dmin)*k/nCorner);
@@ -1132,8 +1090,6 @@ function fmt(v){
   return Number.isInteger(v)?String(v):v.toFixed(1);
 }
 
-// Marching squares with saddle disambiguation via cell-center average.
-// Corner bits: 8=TL(v00), 4=TR(v10), 2=BR(v11), 1=BL(v01)
 function msSegs(v00,v10,v01,v11,lv,ix,iy,N,W,H){
   const b=v=>v>=lv?1:0;
   const ci=b(v00)*8+b(v10)*4+b(v11)*2+b(v01);
@@ -1144,31 +1100,12 @@ function msSegs(v00,v10,v01,v11,lv,ix,iy,N,W,H){
   const L=()=>[x0,l(y0,y1,v00,v01)], R=()=>[x1,l(y0,y1,v10,v11)];
   const s=(a,b)=>[...a,...b];
   switch(ci){
-    case 1: return[s(L(),B())];
-    case 2: return[s(B(),R())];
-    case 3: return[s(L(),R())];
-    case 4: return[s(T(),R())];
-    case 5: { // saddle: TR & BL above
-      const avg = (v00+v10+v11+v01)*0.25;
-      return avg>=lv
-        ? [s(T(),L()), s(B(),R())]
-        : [s(T(),R()), s(L(),B())];
-    }
-    case 6: return[s(T(),B())];
-    case 7: return[s(T(),L())];
-    case 8: return[s(T(),L())];
-    case 9: return[s(T(),B())];
-    case 10: { // saddle: TL & BR above
-      const avg = (v00+v10+v11+v01)*0.25;
-      return avg>=lv
-        ? [s(T(),R()), s(L(),B())]
-        : [s(T(),L()), s(B(),R())];
-    }
-    case 11: return[s(T(),R())];
-    case 12: return[s(L(),R())];
-    case 13: return[s(B(),R())];
-    case 14: return[s(L(),B())];
-    default: return[];
+    case 1:return[s(L(),B())]; case 2:return[s(B(),R())]; case 3:return[s(L(),R())];
+    case 4:return[s(T(),R())]; case 5:return[s(T(),R()),s(L(),B())]; case 6:return[s(T(),B())];
+    case 7:return[s(T(),L())]; case 8:return[s(T(),L())]; case 9:return[s(T(),B())];
+    case 10:return[s(T(),L()),s(B(),R())]; case 11:return[s(T(),R())];
+    case 12:return[s(L(),R())]; case 13:return[s(B(),R())]; case 14:return[s(L(),B())];
+    default:return[];
   }
 }
 
@@ -1178,11 +1115,10 @@ function applyRegion() {
   const errEl = document.getElementById('cf-region-error');
   const rowEl = document.getElementById('cf-region-row');
   if (!expr) {
-    if (regionFn === null) { errEl.textContent = ''; rowEl.classList.remove('error'); return; }
     regionFn = null;
     errEl.textContent = '';
     rowEl.classList.remove('error');
-    redrawStatic();
+    draw();
     return;
   }
   try {
@@ -1194,7 +1130,7 @@ function applyRegion() {
     errEl.textContent = '⚠ ' + e.message.replace(/.*:/,'').trim();
     rowEl.classList.add('error');
   }
-  redrawStatic();
+  draw();
 }
 
 document.getElementById('cf-region-input').addEventListener('keydown', e => { if(e.key==='Enter') applyRegion(); });
@@ -1205,31 +1141,34 @@ document.getElementById('cf-region-clear').addEventListener('click', () => {
 });
 
 // ─── UI wiring ────────────────────────────────────────────────────────────────
-document.getElementById('cf-draw-btn').addEventListener('click', fullDraw);
-document.getElementById('cf-func-input').addEventListener('keydown', e => { if(e.key==='Enter') fullDraw(); });
+document.getElementById('cf-draw-btn').addEventListener('click', draw);
+document.getElementById('cf-func-input').addEventListener('keydown', e => { if(e.key==='Enter')draw(); });
 
 document.getElementById('cf-range-slider').addEventListener('input', function(){
   document.getElementById('cf-range-val').textContent = parseFloat(this.value).toFixed(1);
-  redrawStatic();
+  draw();
 });
 document.getElementById('cf-nlines-slider').addEventListener('input', function(){
   document.getElementById('cf-nlines-val').textContent = this.value;
-  redrawStatic();
+  draw();
 });
 document.getElementById('cf-gamma-slider').addEventListener('input', function(){
   document.getElementById('cf-gamma-val').textContent = parseFloat(this.value).toFixed(2);
-  fullDraw();
+  draw();
 });
 
+// contenteditable gamma value — allow keyboard entry of exact values
 const gammaVal = document.getElementById('cf-gamma-val');
 function applyGammaText() {
   const v = parseFloat(gammaVal.textContent);
   if (!isFinite(v)) { gammaVal.textContent = parseFloat(document.getElementById('cf-gamma-slider').value).toFixed(2); return; }
+  // clamp to extended range to allow Kutta values outside slider range
   const clamped = Math.max(-50, Math.min(50, v));
   gammaVal.textContent = clamped.toFixed(2);
+  // update slider (clamp to slider range)
   const slider = document.getElementById('cf-gamma-slider');
   slider.value = Math.max(parseFloat(slider.min), Math.min(parseFloat(slider.max), clamped));
-  fullDraw();
+  draw();
 }
 gammaVal.addEventListener('keydown', function(e) {
   if (e.key === 'Enter') { e.preventDefault(); this.blur(); }
@@ -1237,6 +1176,7 @@ gammaVal.addEventListener('keydown', function(e) {
 });
 gammaVal.addEventListener('blur', applyGammaText);
 gammaVal.addEventListener('focus', function() {
+  // select all text on focus for easy replacement
   const range = document.createRange();
   range.selectNodeContents(this);
   const sel = window.getSelection();
@@ -1244,6 +1184,13 @@ gammaVal.addEventListener('focus', function() {
   sel.addRange(range);
 });
 
+document.getElementById('cf-light-toggle').addEventListener('click', function(){
+  const isLight = document.documentElement.classList.toggle('light-mode');
+  this.textContent = isLight ? '☾ dark mode' : '☀ light mode';
+  draw();
+});
+
+// initialize gamma group state
 document.getElementById('cf-gamma-group').classList.add('disabled');
 
 document.getElementById('cf-preset-select').addEventListener('change', function(){
@@ -1269,59 +1216,63 @@ document.getElementById('cf-preset-select').addEventListener('change', function(
   const gammaGroup = document.getElementById('cf-gamma-group');
   if (circMode) { gammaGroup.classList.remove('disabled'); }
   else { gammaGroup.classList.add('disabled'); }
-  fullDraw();
+  draw(); // single draw call — regionFn already set above
 });
 
+// Joukowski sliders
 ['cf-jR-slider','cf-ja-slider','cf-jb-slider','cf-jalpha-slider'].forEach(id => {
   document.getElementById(id).addEventListener('input', function(){
     const valId = id.replace('slider','val');
     document.getElementById(valId).textContent = parseFloat(this.value).toFixed(2);
-    if (joukowskiMode) fullDraw();
+    if (joukowskiMode) draw();
   });
 });
 
+// Kutta button
 document.getElementById('cf-kutta-btn').addEventListener('click', function(){
   const gamma = kuttaGamma();
   document.getElementById('cf-gamma-val').textContent = gamma.toFixed(3);
   document.getElementById('cf-gamma-slider').value = Math.max(-12, Math.min(12, gamma));
-  fullDraw();
+  draw();
 });
 
 document.getElementById('cf-btn-stream').addEventListener('click', function(){
   showStream=this.classList.toggle('active');
-  redrawStatic();
+  draw();
 });
 document.getElementById('cf-btn-equip').addEventListener('click', function(){
   showEquip=this.classList.toggle('active');
   document.getElementById('cf-leg-equip').style.opacity=showEquip?'1':'0.3';
-  redrawStatic();
+  draw();
 });
 document.getElementById('cf-btn-color').addEventListener('click', function(){
   showColor=this.classList.toggle('active');
-  redrawStatic();
+  draw();
 });
 
 document.getElementById('cf-btn-vectors').addEventListener('click', function(){
   showVectors=this.classList.toggle('active');
   if (!showParticles) {
+    // just redraw static + vectors, no animation needed
     if (currentF && staticCache) {
       const W=canvas.width, H=canvas.height;
       ctx.clearRect(0,0,W,H);
       ctx.drawImage(staticCache,0,0);
       if (showVectors) drawVectorField(currentF, W, H, currentRange);
-    } else { fullDraw(); }
+    } else { draw(); }
   }
 });
 
 document.getElementById('cf-btn-particles').addEventListener('click', function(){
   showParticles=this.classList.toggle('active');
   if (showParticles) {
-    if (!currentF) { fullDraw(); return; }
+    if (!currentF) { draw(); return; }
     const count = parseInt(document.getElementById('cf-pcount-slider').value);
     initParticles(count, currentRange);
     startAnimation();
   } else {
     stopAnimation();
+    // restore static view
     if (staticCache) {
       const W=canvas.width, H=canvas.height;
       ctx.clearRect(0,0,W,H);
@@ -1342,58 +1293,23 @@ document.getElementById('cf-pcount-slider').addEventListener('input', function()
 });
 document.getElementById('cf-trail-slider').addEventListener('input', function(){
   document.getElementById('cf-trail-val').textContent = this.value;
+  // trim existing trails immediately to new length
   const len = parseInt(this.value);
   for (const p of particles) {
     if (p.trail.length > len) p.trail.splice(0, p.trail.length - len);
   }
 });
 
-// ─── Cursor coords (z, f(z), |f|, arg) ───────────────────────────────────────
-const fmtNum = v => {
-  if (!isFinite(v)) return '∞';
-  const a = Math.abs(v);
-  if (a !== 0 && (a < 1e-3 || a >= 1e4)) return v.toExponential(2);
-  return v.toFixed(3);
-};
-const fmtComplex = (re, im) => {
-  if (!isFinite(re) || !isFinite(im)) return '∞';
-  const ip = im >= 0 ? '+' : '−';
-  return `${fmtNum(re)} ${ip} ${fmtNum(Math.abs(im))}i`;
-};
-const elZ   = document.getElementById('cf-coord-z');
-const elFz  = document.getElementById('cf-coord-fz');
-const elAbs = document.getElementById('cf-coord-abs');
-const elArg = document.getElementById('cf-coord-arg');
-
 canvas.addEventListener('mousemove', function(e){
   const r=canvas.getBoundingClientRect();
   const range=parseFloat(document.getElementById('cf-range-slider').value);
   const x=((e.clientX-r.left)/r.width-0.5)*2*range;
   const y=-(((e.clientY-r.top)/r.height-0.5)*2*range);
-  elZ.textContent = fmtComplex(x, y);
-  if (currentF) {
-    let fz; try { fz = currentF([x, y]); } catch(_) { fz = [NaN, NaN]; }
-    const re=fz[0], im=fz[1];
-    elFz.textContent  = fmtComplex(re, im);
-    const m = Math.sqrt(re*re + im*im);
-    elAbs.textContent = isFinite(m) ? fmtNum(m) : '∞';
-    const a = Math.atan2(im, re);
-    elArg.textContent = isFinite(a) ? `${fmtNum(a)} (${fmtNum(a*180/Math.PI)}°)` : '—';
-  } else {
-    elFz.textContent = elAbs.textContent = elArg.textContent = '—';
-  }
-});
-canvas.addEventListener('mouseleave', () => {
-  elZ.textContent = elFz.textContent = elAbs.textContent = elArg.textContent = '—';
+  document.getElementById('cf-coords').textContent =
+    `z = ${x>=0?'+':''}${x.toFixed(3)} ${y>=0?'+':''}${y.toFixed(3)}i`;
 });
 
-// ─── Debounced resize ────────────────────────────────────────────────────────
-let resizeTimer = null;
-window.addEventListener('resize', () => {
-  if (resizeTimer) clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(fullDraw, 120);
-});
-
-setTimeout(fullDraw, 100);
+window.addEventListener('resize', draw);
+setTimeout(draw, 100);
 
 })();
